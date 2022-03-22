@@ -10,8 +10,6 @@ def getNome(a):
     return a
 
 
-csv = open("test.csv", 'r')
-
 header = []
 
 tokens = ["COMA", "LBEGIN", "LEND", "CONTENT", "FUNC"]
@@ -20,7 +18,7 @@ states = [("lista", "exclusive")]
 
 
 # Listas
-def t_ANY_LBEGIN(t):
+def t_LBEGIN(t):
     r'\w+{'
     t.lexer.push_state("lista")
     header.append(t.value)
@@ -78,6 +76,7 @@ for tok in lexer:
 print(header)
 
 out = open("out.txt", 'x')
+
 lista = ''
 
 for line in text[1:]:
@@ -85,7 +84,6 @@ for line in text[1:]:
     i = 0  # Índice da lista do header
     j = 0  # Índice da lista que corresponde aos campos de uma linha de conteúdo
     out.write('{\n')
-    final_string = ''
 
     lineL = re.split(',', line)
     print(lineL)
@@ -107,9 +105,8 @@ for line in text[1:]:
                             lista = lista + ','
 
             j = limite
-            lista = lista + ']\n'
-            # out.write(lista)
-            # out.write(']\n')
+            lista = lista + '],\n'
+
 
         else:  # É uma String
             if '{' in elem:
@@ -119,17 +116,15 @@ for line in text[1:]:
                 out.write(lista)
                 lista = ''
 
-                print(str(header[i + 1]) + "Lista")
                 nome_Lista = getNome(elem)
                 lista = '\t' + nome_Lista + ': '
-                # out.write('\t' + nome_Lista + ': ')
 
             elif '::' in elem:
                 # É uma Função
                 # Falta aqui aplicar a função à lista
+
                 lista = ''
 
-                print(str(header[i - 2]) + "Função")
                 nome_Funcao = str(header[i - 2]) + '_' + elem
                 nome_Funcao = getNome(nome_Funcao)
                 out.write('\t' + nome_Funcao + ': \n')
@@ -176,3 +171,4 @@ for line in text[1:]:
 # print(lineL)
 
 f.close()
+out.close()
