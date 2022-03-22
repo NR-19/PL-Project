@@ -84,6 +84,7 @@ for line in text[1:]:
 
     i = 0  # Índice da lista do header
     j = 0  # Índice da lista que corresponde aos campos de uma linha de conteúdo
+    sizeHeader = len(header)
     out.write('{\n')
 
     lineL = re.split(',', line)
@@ -106,7 +107,13 @@ for line in text[1:]:
                             lista = lista + ','
 
             j = limite
-            lista = lista + '],\n'
+            fechaLista = '\n'
+
+            # Aqui vejo se é preciso pôr vírgula ou não
+            if i < sizeHeader:
+                fechaLista = ',\n'
+
+            lista = lista + ']' + fechaLista
 
 
         else:  # É uma String
@@ -131,9 +138,13 @@ for line in text[1:]:
                 nome_Funcao = str(header[i - 2]) + '_' + elem
 
                 nome_Funcao = getNome(nome_Funcao)
-                out.write('\t' + nome_Funcao + ': \n')
+                out.write('\t' + nome_Funcao + ': ')
 
-                
+                # Aqui vejo se é preciso pôr vírgula ou não
+                if i < sizeHeader:
+                    out.write(',\n')
+                else:
+                    out.write('\n')
 
             else:
 
@@ -148,8 +159,17 @@ for line in text[1:]:
                 else:
                     campo = getNome(elem)
                     out.write('\t' + campo + ': ')
-                    out.write(getNome(lineL[j]) + '\n')
+                    out.write(getNome(lineL[j]))
+
+                    # Aqui ver se é preciso pôr vírgula ou não
+                    if i < sizeHeader:
+                        out.write(',\n')
+                    else:
+                        out.write('\n')
+
                 j = j + 1
+
+
 
         i = i + 1
 
