@@ -1,3 +1,4 @@
+from email.policy import default
 import ply.lex as lex
 import re
 
@@ -123,11 +124,17 @@ for line in text[1:]:
                 # É uma Função
                 # Falta aqui aplicar a função à lista
 
+                resultado = str(calculaFunc(lista,header[i - 2]))
+
                 lista = ''
 
                 nome_Funcao = str(header[i - 2]) + '_' + elem
+
                 nome_Funcao = getNome(nome_Funcao)
                 out.write('\t' + nome_Funcao + ': \n')
+
+                
+
             else:
 
                 # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
@@ -172,3 +179,30 @@ for line in text[1:]:
 
 f.close()
 out.close()
+
+
+
+
+def calculaFunc(lista,nomeFunc):
+    stringList = re.split(',', lista)
+    numberList = []
+    
+    for elem in stringList:
+        elem.replace('[', '')
+        elem.replace(']', '')
+        numberList.append(int(elem))
+
+    match nomeFunc:
+        case "sum":
+            ans = sum(numberList)
+        case "average":
+            ans = sum(numberList) / len(numberList)
+        case "max":
+            ans = max(numberList)
+        case "min":
+            ans = min(numberList)
+        case "range":
+            ans = abs(max(numberList) -  min(numberList))
+        case _:
+            ans = 0;
+    return ans
