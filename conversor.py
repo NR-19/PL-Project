@@ -1,6 +1,36 @@
-from email.policy import default
+import string
 import ply.lex as lex
 import re
+
+
+def calculaFunc(lista,nomeFunc):
+    stringList = re.split(',', lista)
+    numberList = []
+    
+    for elem in stringList:
+        temp = re.search(r'\d+',elem)
+        if temp != None:
+            temp = temp.group()
+            numberList.append(int(temp))
+
+    nomeFunc = nomeFunc.replace("::", "")
+
+    match nomeFunc:
+        case "sum":
+            ans = sum(numberList)
+        case "average":
+            ans = sum(numberList) / len(numberList)
+        case "max":
+            ans = max(numberList)
+        case "min":
+            ans = min(numberList)
+        case "range":
+            ans = abs(max(numberList) -  min(numberList))
+        case _:
+            ans = 0;
+    return ans
+
+
 
 
 def getNome(a):
@@ -76,7 +106,7 @@ for tok in lexer:
 
 print(header)
 
-out = open("out.txt", 'x')
+out = open("out.txt", 'w')
 
 lista = ''
 
@@ -131,7 +161,7 @@ for line in text[1:]:
                 # É uma Função
                 # Falta aqui aplicar a função à lista
 
-                resultado = str(calculaFunc(lista,header[i - 2]))
+                resultado = str(calculaFunc(lista,header[i]))
 
                 lista = ''
 
@@ -139,7 +169,7 @@ for line in text[1:]:
 
                 nome_Funcao = getNome(nome_Funcao)
                 out.write('\t' + nome_Funcao + ': ')
-
+                out.write(resultado)
                 # Aqui vejo se é preciso pôr vírgula ou não
                 if i < sizeHeader:
                     out.write(',\n')
@@ -203,26 +233,3 @@ out.close()
 
 
 
-def calculaFunc(lista,nomeFunc):
-    stringList = re.split(',', lista)
-    numberList = []
-    
-    for elem in stringList:
-        elem.replace('[', '')
-        elem.replace(']', '')
-        numberList.append(int(elem))
-
-    match nomeFunc:
-        case "sum":
-            ans = sum(numberList)
-        case "average":
-            ans = sum(numberList) / len(numberList)
-        case "max":
-            ans = max(numberList)
-        case "min":
-            ans = min(numberList)
-        case "range":
-            ans = abs(max(numberList) -  min(numberList))
-        case _:
-            ans = 0;
-    return ans
