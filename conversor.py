@@ -1,6 +1,5 @@
 import ply.lex as lex
 import re
-import sys
 
 
 def getNome(a):
@@ -79,12 +78,14 @@ for tok in lexer:
 print(header)
 
 out = open("out.txt", 'x')
+lista = ''
 
 for line in text[1:]:
 
     i = 0  # Índice da lista do header
     j = 0  # Índice da lista que corresponde aos campos de uma linha de conteúdo
     out.write('{\n')
+    final_string = ''
 
     lineL = re.split(',', line)
     print(lineL)
@@ -92,39 +93,55 @@ for line in text[1:]:
     # Para cada linha, ler o header e fazer as operações necessárias
     for elem in header:
         if type(elem) == list:
-            out.write('[')
-            lista_write = ''
+            # out.write('[')
+
             limite = int(elem[-1]) + j
+            lista = lista + '['
 
             for x in range(j, limite):
                 elemL = lineL[x]
                 if elemL != '':
-                    lista_write = lista_write + elemL
-                    if x < (limite-1):
-                        if lineL[x+1] != '':
-                            lista_write = lista_write + ','
-            print(limite)
-            print(j)
+                    lista = lista + elemL
+                    if x < (limite - 1):
+                        if lineL[x + 1] != '':
+                            lista = lista + ','
+
             j = limite
-            out.write(lista_write)
-            out.write(']\n')
+            lista = lista + ']\n'
+            # out.write(lista)
+            # out.write(']\n')
 
         else:  # É uma String
             if '{' in elem:
                 # É uma Lista
+
+                # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
+                out.write(lista)
+                lista = ''
+
                 print(str(header[i + 1]) + "Lista")
                 nome_Lista = getNome(elem)
-                out.write('\t' + nome_Lista + ': ')
+                lista = '\t' + nome_Lista + ': '
+                # out.write('\t' + nome_Lista + ': ')
 
             elif '::' in elem:
                 # É uma Função
+                # Falta aqui aplicar a função à lista
+                lista = ''
+
                 print(str(header[i - 2]) + "Função")
                 nome_Funcao = str(header[i - 2]) + '_' + elem
                 nome_Funcao = getNome(nome_Funcao)
                 out.write('\t' + nome_Funcao + ': \n')
             else:
+
+                # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
+                out.write(lista)
+                lista = ''
+
                 # Apenas um Campo normal
                 if elem == '':
+                    # Aqui é um elemento da lista em falta, ou campo vazio
                     pass
                 else:
                     campo = getNome(elem)
