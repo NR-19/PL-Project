@@ -1,15 +1,15 @@
-import string
+import sys
 import ply.lex as lex
 import re
 
 
-def calculaFunc(lista,nomeFunc):
-    stringList = re.split(',', lista)
+def calculaFunc(list, nomeFunc):
+    stringList = re.split(',', list)
     numberList = []
-    
-    for elem in stringList:
-        temp = re.search(r'\d+',elem)
-        if temp != None:
+
+    for e in stringList:
+        temp = re.search(r'\d+', e)
+        if temp is not None:
             temp = temp.group()
             numberList.append(int(temp))
 
@@ -25,12 +25,10 @@ def calculaFunc(lista,nomeFunc):
         case "min":
             ans = min(numberList)
         case "range":
-            ans = abs(max(numberList) -  min(numberList))
+            ans = abs(max(numberList) - min(numberList))
         case _:
-            ans = 0;
+            ans = 0
     return ans
-
-
 
 
 def getNome(a):
@@ -41,6 +39,7 @@ def getNome(a):
     return a
 
 
+# Lista que contém os campos do header do csv
 header = []
 
 tokens = ["COMA", "LBEGIN", "LEND", "CONTENT", "FUNC"]
@@ -95,141 +94,146 @@ def t_ANY_error(t):
     print("ERROR : " + t.value)
 
 
-lexer = lex.lex()
+def readCSV(csv,json):
 
-f = open("test.csv", 'r')
-text = f.readlines()
-lexer.input(text[0])
+    # Construir o lexer
+    lexer = lex.lex()
 
-for tok in lexer:
-    pass
+    # Abrir o csv e ler a primeira linha (header)
+    f = open(csv, 'r')
+    lines = f.readlines()
+    lexer.input(lines[0])
 
-print(header)
+    for _ in lexer:
+        pass
 
-out = open("out.txt", 'w')
+    print(header)
+    out = open(json, 'w')
 
-lista = ''
+    linhasSize = len(lines[1:])
 
-for line in text[1:]:
+    out.write('[')
+    lineCounter = 0
 
-    i = 0  # Índice da lista do header
-    j = 0  # Índice da lista que corresponde aos campos de uma linha de conteúdo
-    sizeHeader = len(header)
-    out.write('{\n')
+    for line in lines[1:]:
 
-    lineL = re.split(',', line)
-    print(lineL)
+        lista = '' # String que corresponde à lista que será ou não imprimida no json
+        i = 0  # Índice da lista do header
+        j = 0  # Índice da lista que corresponde aos campos de uma linha de conteúdo
+        sizeHeader = len(header)
+        out.write('\n\t{\n')
 
-    # Para cada linha, ler o header e fazer as operações necessárias
-    for elem in header:
-        if type(elem) == list:
-            # out.write('[')
+        lineL = re.split(',', line)
+        print(lineL)
 
-            limite = int(elem[-1]) + j
-            lista = lista + '['
+        # Para cada linha, ler o header e fazer as operações necessárias
+        for elem in header:
 
-            for x in range(j, limite):
-                elemL = lineL[x]
-                if elemL != '':
-                    lista = lista + elemL
-                    if x < (limite - 1):
-                        if lineL[x + 1] != '':
-                            lista = lista + ','
+            if type(elem) == list:
 
-            j = limite
-            fechaLista = '\n'
+                limite = int(elem[-1]) + j
+                lista = lista + '['
 
-            # Aqui vejo se é preciso pôr vírgula ou não
-            if i < sizeHeader:
-                fechaLista = ',\n'
+                for x in range(j, limite):
 
-            lista = lista + ']' + fechaLista
+                    elemL = lineL[x]
+                    if elemL != '':
+                        lista = lista + elemL
+                        if x < (limite - 1):
+                            if lineL[x + 1] != '':
+                                lista = lista + ','
 
+                j = limite
+                fechaLista = '\n'
 
-        else:  # É uma String
-            if '{' in elem:
-                # É uma Lista
-
-                # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
-                out.write(lista)
-                lista = ''
-
-                nome_Lista = getNome(elem)
-                lista = '\t' + nome_Lista + ': '
-
-            elif '::' in elem:
-                # É uma Função
-                # Falta aqui aplicar a função à lista
-
-                resultado = str(calculaFunc(lista,header[i]))
-
-                lista = ''
-
-                nome_Funcao = str(header[i - 2]) + '_' + elem
-
-                nome_Funcao = getNome(nome_Funcao)
-                out.write('\t' + nome_Funcao + ': ')
-                out.write(resultado)
                 # Aqui vejo se é preciso pôr vírgula ou não
-                if i < sizeHeader:
-                    out.write(',\n')
-                else:
-                    out.write('\n')
+                if i < sizeHeader-1:
+                    fechaLista = ',\n'
 
-            else:
+                lista = lista + ']' + fechaLista
 
-                # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
-                out.write(lista)
-                lista = ''
+            else:  # É uma String
 
-                # Apenas um Campo normal
-                if elem == '':
-                    # Aqui é um elemento da lista em falta, ou campo vazio
-                    pass
-                else:
-                    campo = getNome(elem)
-                    out.write('\t' + campo + ': ')
-                    out.write(getNome(lineL[j]))
+                if '{' in elem:
+                    # É uma Lista
 
-                    # Aqui ver se é preciso pôr vírgula ou não
-                    if i < sizeHeader:
+                    # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
+                    out.write(lista)
+                    lista = ''
+
+                    nome_Lista = getNome(elem)
+                    lista = '\t\t' + nome_Lista + ': '
+
+                elif '::' in elem:
+                    # É uma Função
+                    # Falta aqui aplicar a função à lista
+
+                    resultado = str(calculaFunc(lista, header[i]))
+
+                    lista = ''
+
+                    nome_Funcao = str(header[i - 2]) + '_' + elem
+
+                    nome_Funcao = getNome(nome_Funcao)
+                    out.write('\t\t' + nome_Funcao + ': ')
+                    out.write(resultado)
+                    # Aqui vejo se é preciso pôr vírgula ou não
+                    if i < sizeHeader-1:
                         out.write(',\n')
+
                     else:
                         out.write('\n')
 
-                j = j + 1
+                else:
+
+                    # A lista só é escrita para o json agora, pq sabemos que não será aplicada função à mesma
+                    out.write(lista)
+                    lista = ''
+
+                    # Apenas um Campo normal
+                    if elem == '':
+                        # Aqui é um elemento da lista em falta, ou campo vazio
+                        pass
+
+                    else:
+                        campo = getNome(elem)
+                        out.write('\t\t' + campo + ': ')
+                        out.write(getNome(lineL[j]))
+
+                        # Aqui ver se é preciso pôr vírgula ou não
+                        if i < sizeHeader-1:
+                            out.write(',\n')
+
+                        else:
+                            out.write('\n')
+
+                    j = j + 1
+
+            i = i + 1
+
+        lineCounter = lineCounter + 1
 
 
+        # Ver se é preciso ','
+        fechaElemento = '\n\t}'
+        if lineCounter<linhasSize:
+            fechaElemento = fechaElemento + ','
 
-        i = i + 1
+        out.write(fechaElemento)
 
-    out.write('\n}')
+    out.write('\n]')
 
-# numeroDeArgumentos = len(header)
-#
-# ultima = r'(?:(.+))'
-# exp = r'(?:(.+),)'
-#
-#
-# for i in range(numeroDeArgumentos-2):
-#    exp = exp + teste
-#
-# exp = exp + ultima
-# print(exp)
+    f.close()
+    out.close()
 
 
-# p1 = re.compile(r'\w+')
-# print(p1.search())
-# p2 = re.compile(r'\d+,(([A-Za-zâí]+ ?)+,){2}(\d+,){4}\d+')
+def main():
 
-# for linha in csv.readlines():
-# print(p2.match(linha).group())
-# lineL = re.split(',',linha)
-# print(lineL)
+    # Lista de argumentos em que agrs[1] é o ficheiro csv (input) e args[2] é o json (ficheiro output)
+    args = sys.argv[1:]
 
-f.close()
-out.close()
+    readCSV(args[0],args[1])
 
 
-
-
+if __name__ == "__main__":
+    main()
