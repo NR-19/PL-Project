@@ -107,15 +107,13 @@ def readCSV(csv,json):
     for _ in lexer:
         pass
 
-    print(header)
     out = open(json, 'w')
-
     linhasSize = len(lines[1:])
 
     out.write('[')
-    lineCounter = 0
 
-    for line in lines[1:]:
+
+    for num,line in enumerate(lines[1:]):
 
         lista = '' # String que corresponde à lista que será ou não imprimida no json
         i = 0  # Índice da lista do header
@@ -124,7 +122,6 @@ def readCSV(csv,json):
         out.write('\n\t{\n')
 
         lineL = re.split(',', line)
-        print(lineL)
 
         # Para cada linha, ler o header e fazer as operações necessárias
         for elem in header:
@@ -211,12 +208,10 @@ def readCSV(csv,json):
 
             i = i + 1
 
-        lineCounter = lineCounter + 1
-
 
         # Ver se é preciso ','
         fechaElemento = '\n\t}'
-        if lineCounter<linhasSize:
+        if num<linhasSize-1:
             fechaElemento = fechaElemento + ','
 
         out.write(fechaElemento)
