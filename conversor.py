@@ -96,13 +96,14 @@ def t_ANY_error(t):
 
 def readCSV(csv,json):
 
-    # Construir o lexer
-    lexer = lex.lex()
-
     # Abrir o csv e ler a primeira linha (header)
     f = open(csv, 'r')
     lines = f.readlines()
+
+    # Construir o lexer
+    lexer = lex.lex()
     lexer.input(lines[0])
+
 
     for _ in lexer:
         pass
@@ -111,7 +112,6 @@ def readCSV(csv,json):
     linhasSize = len(lines[1:])
 
     out.write('[')
-
 
     for num,line in enumerate(lines[1:]):
 
