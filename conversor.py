@@ -122,6 +122,8 @@ def readCSV(csv,json):
         out.write('\n\t{\n')
 
         lineL = re.split(',', line)
+        lineL[-1] = lineL[-1].replace("\n","")
+        print(lineL)
 
         # Para cada linha, ler o header e fazer as operações necessárias
         for elem in header:
@@ -177,8 +179,6 @@ def readCSV(csv,json):
                     if i < sizeHeader-1:
                         out.write(',\n')
 
-                    else:
-                        out.write('\n')
 
                 else:
 
@@ -186,7 +186,7 @@ def readCSV(csv,json):
                     out.write(lista)
                     lista = ''
 
-                    # Aqui é um elemento da lista em falta, ou campo vazio
+                    # Aqui é um elemento da lista em falta
                     if elem == '':
                         pass
 
@@ -203,23 +203,28 @@ def readCSV(csv,json):
                             s=lineL[j].lower()
 
                         else:# Apenas um Campo normal
-                            s=getNome(lineL[j])
+
+                            if lineL[j] != '':
+                                s=getNome(lineL[j])
+
+                            else:# Aqui o valor do json é nulo
+
+                                s='null'
+
 
                         out.write(s)
 
-                        # Aqui ver se é preciso pôr vírgula ou não
+                        # Aqui ver se é preciso pôr vírgula ou não dentro do elemento json
                         if i < sizeHeader-1:
                             out.write(',\n')
 
-                        else:
-                            out.write('\n')
 
                     j = j + 1
 
             i = i + 1
 
 
-        # Ver se é preciso ','
+        # Ver se é preciso ',' no elemento da lista json
         fechaElemento = '\n\t}'
         if num<linhasSize-1:
             fechaElemento = fechaElemento + ','
