@@ -1,4 +1,4 @@
-Número,Nome,Curso,Nota{3,5},,,,,,Alcunha,Maior de idade
+Número,Nome,Curso,Nota{3,5}::sum,,,,,,Alcunha,Maior de idade
 3162,Candido Faísca,Teatro,12,13,14,15,16,Faísca McQueen,true
 7777,Cristiano Ronaldo,,17,12,20,,,Bébé Chorão,True
 93188,Nelsu Miranda,MIEI,20,20,20,20,20,Gervásio Motoboy,False

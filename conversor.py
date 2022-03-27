@@ -110,8 +110,6 @@ def readCSV(csv,json):
 
     out = open(json, 'w')
     linhasSize = len(lines[1:])
-    # sizeHeader = len(header)
-    print(header)
 
     out.write('[')
 
@@ -127,7 +125,6 @@ def readCSV(csv,json):
         lineL[-1] = lineL[-1].replace("\n","")
         lineL_size = len(lineL)
 
-        print(lineL)
 
         # Para cada linha, ler o header e fazer as operações necessárias
         for elem in header:
