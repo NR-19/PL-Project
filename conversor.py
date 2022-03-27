@@ -110,6 +110,8 @@ def readCSV(csv,json):
 
     out = open(json, 'w')
     linhasSize = len(lines[1:])
+    # sizeHeader = len(header)
+    print(header)
 
     out.write('[')
 
@@ -118,11 +120,13 @@ def readCSV(csv,json):
         lista = '' # String que corresponde à lista que será ou não imprimida no json
         i = 0  # Índice da lista do header
         j = 0  # Índice da lista que corresponde aos campos de uma linha de conteúdo
-        sizeHeader = len(header)
+
         out.write('\n\t{\n')
 
         lineL = re.split(',', line)
         lineL[-1] = lineL[-1].replace("\n","")
+        lineL_size = len(lineL)
+
         print(lineL)
 
         # Para cada linha, ler o header e fazer as operações necessárias
@@ -143,10 +147,10 @@ def readCSV(csv,json):
                                 lista = lista + ','
 
                 j = limite
-                fechaLista = '\n'
+                fechaLista = ''
 
                 # Aqui vejo se é preciso pôr vírgula ou não
-                if i < sizeHeader-1:
+                if j < lineL_size-1:
                     fechaLista = ',\n'
 
                 lista = lista + ']' + fechaLista
@@ -176,7 +180,7 @@ def readCSV(csv,json):
                     out.write('\t\t' + nome_Funcao + ': ')
                     out.write(resultado)
                     # Aqui vejo se é preciso pôr vírgula ou não
-                    if i < sizeHeader-1:
+                    if j < lineL_size-1:
                         out.write(',\n')
 
 
@@ -215,7 +219,7 @@ def readCSV(csv,json):
                         out.write(s)
 
                         # Aqui ver se é preciso pôr vírgula ou não dentro do elemento json
-                        if i < sizeHeader-1:
+                        if j < lineL_size-1:
                             out.write(',\n')
 
 
