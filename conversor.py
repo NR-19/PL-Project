@@ -163,7 +163,6 @@ def readCSV(csv,json):
 
                 elif '::' in elem:
                     # É uma Função
-                    # Falta aqui aplicar a função à lista
 
                     resultado = str(calculaFunc(lista, header[i]))
 
@@ -187,15 +186,26 @@ def readCSV(csv,json):
                     out.write(lista)
                     lista = ''
 
-                    # Apenas um Campo normal
+                    # Aqui é um elemento da lista em falta, ou campo vazio
                     if elem == '':
-                        # Aqui é um elemento da lista em falta, ou campo vazio
                         pass
 
+                    # Campo normal ou valor booleano
                     else:
                         campo = getNome(elem)
                         out.write('\t\t' + campo + ': ')
-                        out.write(getNome(lineL[j]))
+
+                        bool = re.match(r'([Tt]rue|[Ff]alse)',lineL[j])
+                        s = ''
+
+                        if bool is not None:#Valor do tipo bool
+                            # É aplicada a função lower case para cumprir com a sintaxe do json
+                            s=lineL[j].lower()
+
+                        else:# Apenas um Campo normal
+                            s=getNome(lineL[j])
+
+                        out.write(s)
 
                         # Aqui ver se é preciso pôr vírgula ou não
                         if i < sizeHeader-1:
